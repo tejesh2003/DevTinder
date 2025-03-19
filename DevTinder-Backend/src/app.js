@@ -2,90 +2,32 @@ const express = require("express");
 const ConnectDb = require("./config/database.js");
 const app = express();
 const User = require("./models/user.js");
-const { validateSignUpData } = require("./utils/validation.js");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const { userAuth } = require("./middlewares/auth.js");
 
 app.use(cookieParser());
 app.use(express.json());
 
-//user signup
-app.post("/signup", async (req, res) => {
-  try {
-    validateSignUpData(req);
-    const { firstName, lastName, skills, emailId, about, password } = req.body;
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      skills,
-      about,
-      password: passwordHash,
-    });
+const authRouter = require("./routes/auth.js");
+const profileRouter = require("./routes/profile.js");
+const requestRouter = require("./routes/request.js");
 
-    await user.save();
-    res.send("User created");
-  } catch (err) {
-    res.status(400).send("Error in creating user" + err.message);
-  }
-});
-
-//login user
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-    const user = await User.findOne({ emailId });
-    if (!user) throw new Error("Invalid credentials");
-    const passwordHash = await bcrypt.hash(password, 10);
-    const isMatch = await bcrypt.compare(password, passwordHash);
-    if (!isMatch) {
-      throw new Error("Invalid credentials");
-    } else {
-      const token = jwt.sign({ _id: user._id }, "TinderofDevelopers", {
-        expiresIn: "1d",
-      });
-      res.cookie("token", token);
-      res.send("Login Successful");
-    }
-  } catch (err) {
-    res.status(400).send("Error in login: " + err.message);
-  }
-});
-
-//get user profile
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("Error in fetching profile " + err.message);
-  }
-});
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 //get all feed
-app.get("/feed", async (req, res) => {
-  try {
-    const feed = await User.find();
-    if (feed.length === 0) res.status(404).send("No feed available");
-    res.send(feed);
-  } catch (err) {
-    res.status(400).send("Error in fetching feed" + err.message);
-  }
-});
+// app.get("/feed", async (req, res) => {
+//   try {
+//     const feed = await User.find();
+//     if (feed.length === 0) res.status(404).send("No feed available");
+//     res.send(feed);
+//   } catch (err) {
+//     res.status(400).send("Error in fetching feed" + err.message);
+//   }
+// });
 
 //send connection request
 
-//logout user
-// app.post("/logout",async(req,res)=>{
-//   try {
-//     res.clearCookie("token");
-//   }catch(err){
-//     res.status(400).send("Error in logout: " + err.message);
-//   }
-// })
 // //get user
 // app.get("/user", async (req, res) => {
 //   try {
