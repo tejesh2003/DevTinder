@@ -3,6 +3,7 @@ const User = require("../models/user.js");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("../middlewares/auth.js");
 const { validateSignUpData } = require("../utils/validation.js");
 
 //user signup
@@ -50,7 +51,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 //logout user
-authRouter.post("/logout", async (req, res) => {
+authRouter.post("/logout", userAuth, async (req, res) => {
   try {
     res.clearCookie("token");
     res.send("Logged out");
@@ -58,5 +59,7 @@ authRouter.post("/logout", async (req, res) => {
     res.status(400).send("Error in logout: " + err.message);
   }
 });
+
+//forgot password
 
 module.exports = authRouter;
