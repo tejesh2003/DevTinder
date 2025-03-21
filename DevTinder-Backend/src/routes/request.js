@@ -45,4 +45,40 @@ requestRouter.post(
   }
 );
 
+requestRouter.patch(
+  "/request/review/:status/:reqId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const user = req.user;
+      const { status, reqId } = req.params;
+      if (!["accepted", "rejected"].includes(status)) {
+        throw new Error("Invalid status");
+      }
+      const request = await ConnectionRequest.findById(reqId);
+      if (!request) {
+        throw new Error("Request not found");
+      }
+      if (request.status != "interested") {
+        throw new Error("Request is not interested");
+      }
+      if (user._id != request.receiver) {
+        throw new Error(
+          "You can't review a request that is not addressed to you"
+        );
+      }
+      await ConnectionRequest.findByIdAndUpdate(
+        reqId,
+        { status },
+        {
+          runValidators: true,
+        }
+      );
+      res.send(`Connection Request ${status} successfully`);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
 module.exports = requestRouter;
