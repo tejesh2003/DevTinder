@@ -61,5 +61,21 @@ authRouter.post("/logout", userAuth, async (req, res) => {
 });
 
 //forgot password
+// authRouter.post("/forgotpassword", userAuth, async (req, res) => {
+//   try {
+//     const { emailId } = req.body;
+//     const user = req.user;
+//     const ALLOWED_FIELDS = ["emailId","password"];
+//     const isUpdateAllowed = Object.keys(req.body).every((key) =>
+//       ALLOWED_FIELDS.includes(key)
+//     );
+//     if (!isUpdateAllowed) {
+//       throw new Error("Invalid update fields");
+//     }
+//     await User.findByIdAndUpdate(user._id, req.body, { runValidators: true });
+//   } catch (err) {
+//     res.status(400).send("Error in updating password: " + err.message);
+//   }
+// });
 
 module.exports = authRouter;

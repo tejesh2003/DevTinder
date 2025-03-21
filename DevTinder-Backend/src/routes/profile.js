@@ -29,7 +29,7 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
       throw new Error("Max number of skills are 10");
     }
     await User.findByIdAndUpdate(userId, data, { runValidators: true });
-    res.send("Updated the user");
+    res.send(user.firstName + " your profile is updated");
   } catch (err) {
     res.status(400).send("Error in updating profile " + err.message);
   }
