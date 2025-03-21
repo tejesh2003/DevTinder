@@ -14,13 +14,15 @@ const connectionRequestSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: {
-        values: ["interested", "igonored", "rejected", "accepted"],
+        values: ["interested", "ignored", "rejected", "accepted"],
         message: `{VALUE} is incorrect status type`,
       },
     },
   },
   { timestamps: true }
 );
+
+connectionRequestSchema.index({ sender: 1, receiver: 1 });
 
 const ConnectionRequestModel = new mongoose.model(
   "ConnectionRequest",
