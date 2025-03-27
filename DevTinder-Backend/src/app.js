@@ -9,21 +9,12 @@ app.use(express.json());
 const authRouter = require("./routes/auth.js");
 const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
+const userRouter = require("./routes/user.js");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
-
-//get all feed
-// app.get("/feed", async (req, res) => {
-//   try {
-//     const feed = await User.find();
-//     if (feed.length === 0) res.status(404).send("No feed available");
-//     res.send(feed);
-//   } catch (err) {
-//     res.status(400).send("Error in fetching feed" + err.message);
-//   }
-// });
+app.use("/", userRouter);
 
 ConnectDb()
   .then(() => {

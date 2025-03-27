@@ -62,7 +62,7 @@ requestRouter.patch(
       if (request.status != "interested") {
         throw new Error("Request is not interested");
       }
-      if (user._id != request.receiver) {
+      if (user._id.toString() !== request.receiver.toString()) {
         throw new Error(
           "You can't review a request that is not addressed to you"
         );

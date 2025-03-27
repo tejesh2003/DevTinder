@@ -23,6 +23,7 @@ const connectionRequestSchema = new mongoose.Schema(
 );
 
 connectionRequestSchema.index({ sender: 1, receiver: 1 });
+connectionRequestSchema.index({ receiver: 1, status: 1 });
 
 const ConnectionRequestModel = new mongoose.model(
   "ConnectionRequest",
