@@ -45,6 +45,8 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const user = req.user;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
     let requests = await ConnectionRequestModel.find({
       $or: [{ receiver: user._id }, { sender: user._id }],
     })
@@ -60,7 +62,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     );
     const filteredUsers = await User.find({
       $and: [{ _id: { $ne: user._id } }, { _id: { $nin: [...connectionIds] } }],
-    }).select(SAFE_DATA);
+    })
+      .select(SAFE_DATA)
+      .skip(limit * (page - 1))
+      .limit(limit);
     res.send(filteredUsers);
   } catch (err) {
     res.status(500).json({ message: err.message });
