@@ -10,23 +10,25 @@ const Profile = () => {
         <figure>
           <img
             src={
-              user.photoUrl ||
+              user?.photoUrl ||
               "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
             }
             alt="Profile"
           />
         </figure>
         <div className="card-body">
-          <h2 className="card-title">{user.firstName + " " + user.lastName}</h2>
+          <h2 className="card-title">
+            {user?.firstName + " " + user?.lastName}
+          </h2>
 
-          {user.about && (
+          {user?.about && (
             <div className="mt-4">
               <h3 className="text-lg font-semibold">About</h3>
               <p className="text-sm text-gray-600">{user.about}</p>
             </div>
           )}
 
-          {user.skills && (
+          {user?.skills && (
             <div className="mt-4">
               <h3 className="text-lg font-semibold">Skills</h3>
               <ul className="list-disc list-inside text-sm text-gray-600">
