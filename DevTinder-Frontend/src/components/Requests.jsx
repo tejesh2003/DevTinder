@@ -8,7 +8,6 @@ const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
   const [requestsFetched, setRequestsFetched] = useState(false);
-  const [item, setItem] = useState(0);
 
   const fetchRequests = async () => {
     try {
@@ -27,133 +26,100 @@ const Requests = () => {
     fetchRequests();
   }, [requests.length]);
 
-  const handlePrev = () => {
-    setItem((prev) => (prev === 0 ? requests.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setItem((prev) => (prev === requests.length - 1 ? 0 : prev + 1));
-  };
-  const handleReject = async () => {
+  const handleReject = async (id) => {
     try {
-      const res = await axios.patch(
-        BASE_URL + `/request/review/rejected/${requests[item]._id}`,
+      await axios.patch(
+        BASE_URL + `/request/review/rejected/${id}`,
         {},
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
+      dispatch(removeRequests(id));
     } catch (err) {
       console.log(err);
     }
   };
-  const handleAccept = async () => {
+
+  const handleAccept = async (id) => {
     try {
       const res = await axios.patch(
-        BASE_URL + `/request/review/accepted/${requests[item]._id}`,
+        BASE_URL + `/request/review/accepted/${id}`,
         {},
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       dispatch(removeRequests(res.data._id));
     } catch (err) {
       console.log(err);
-    }
-    if (item === requests.length - 1) {
-      setItem(item - 1);
     }
   };
 
   return (
     <>
       {requests.length > 0 && (
-        <div className="flex flex-col items-center justify-center mt-2">
-          <h2 className="text-lg font-semibold mb-4">
-            Total Requests: {requests.length}
-          </h2>
-          <div className="relative flex items-center">
-            <button
-              onClick={handlePrev}
-              className="mr-4 bg-gray-200 hover:bg-gray-300 rounded-full p-2 cursor-pointer"
+        <div className="flex flex-col items-center justify-center mt-4 space-y-4">
+          <h1 className="text-2xl font-bold text-center mb-2">
+            Requests: {requests.length}
+          </h1>
+
+          {requests.map((req) => (
+            <div
+              key={req._id}
+              className="mx-auto w-full max-w-4xl flex bg-white shadow-md rounded-lg overflow-hidden"
             >
-              ⬅️
-            </button>
+              <img
+                src={
+                  req.sender?.photoUrl ||
+                  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                }
+                alt="Profile"
+                className="w-32 h-32 object-cover"
+              />
 
-            <div className="card bg-base-100 w-96 shadow-md h-130">
-              <figure>
-                <img
-                  src={
-                    requests[item]?.sender?.photoUrl ||
-                    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-                  }
-                  alt="Profile"
-                  className="w-full h-64 object-cover"
-                />
-              </figure>
+              <div className="flex justify-between items-center flex-1 p-4">
+                <div className="flex flex-col">
+                  <h2 className="text-lg font-semibold">
+                    {req.sender?.firstName} {req.sender?.lastName}
+                  </h2>
 
-              <div className="card-body space-y-2 pt-4">
-                <h2 className="card-title">
-                  {requests[item]?.sender?.firstName +
-                    " " +
-                    requests[item]?.sender?.lastName}
-                </h2>
-
-                {(requests[item]?.sender?.age ||
-                  requests[item]?.sender?.gender) && (
-                  <p className="text-sm text-gray-600">
-                    {requests[item]?.sender?.age &&
-                      `Age: ${requests[item]?.sender?.age}`}{" "}
-                    {requests[item]?.sender?.gender &&
-                      `| Gender: ${requests[item].sender?.gender}`}
-                  </p>
-                )}
-
-                {requests[item]?.sender?.about && (
-                  <div>
-                    <h3 className="text-sm font-semibold">About</h3>
-                    <p className="text-sm text-gray-600">
-                      {requests[item]?.sender?.about}
+                  {(req.sender?.age || req.sender?.gender) && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {req.sender?.age && `Age: ${req.sender.age}`}{" "}
+                      {req.sender?.gender && `| Gender: ${req.sender.gender}`}
                     </p>
-                  </div>
-                )}
+                  )}
 
-                {requests[item]?.sender?.skills?.length > 0 && (
-                  <div className="flex items-center justify-between mt-2">
-                    <ul className="list-disc list-inside text-sm text-gray-600">
-                      {requests[item]?.sender?.skills.map((skill, index) => (
-                        <li key={index}>{skill}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                  {req.sender?.about && (
+                    <p className="text-sm mt-2 text-gray-700">
+                      <strong>About:</strong> {req.sender.about}
+                    </p>
+                  )}
 
-                <div className="flex justify-between mt-2 gap-2">
+                  {req.sender?.skills?.length > 0 && (
+                    <p className="text-sm mt-2 text-gray-700">
+                      <strong>Skills:</strong> {req.sender.skills.join(", ")}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2 ml-4">
                   <button
-                    onClick={handleReject}
-                    className="btn btn-sm btn-error text-white hover:opacity-90 cursor-pointer"
+                    onClick={() => handleReject(req._id)}
+                    className="btn btn-sm btn-error text-white hover:opacity-90"
                   >
                     Reject
                   </button>
                   <button
-                    onClick={handleAccept}
-                    className="btn btn-sm btn-success text-white hover:opacity-90 cursor-pointer"
+                    onClick={() => handleAccept(req._id)}
+                    className="btn btn-sm btn-success text-white hover:opacity-90"
                   >
                     Accept
                   </button>
                 </div>
               </div>
             </div>
-
-            <button
-              onClick={handleNext}
-              className="ml-4 bg-gray-200 hover:bg-gray-300 rounded-full p-2 cursor-pointer"
-            >
-              ➡️
-            </button>
-          </div>
+          ))}
         </div>
       )}
+
       {requestsFetched && requests.length === 0 && (
         <div className="flex flex-col items-center justify-center mt-10">
           <div className="alert alert-info w-fit shadow-lg">
