@@ -5,7 +5,7 @@ const Profile = () => {
   const user = useSelector((store) => store.user);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center mt-10">
       <div className="card bg-base-100 w-96 shadow-md">
         <figure>
           <img
