@@ -4,10 +4,11 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
+import { Link } from "react-router-dom";
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("teja123@gmail.com");
-  const [password, setPassword] = useState("Chintu@123");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogin = async () => {
@@ -47,6 +48,7 @@ const Login = () => {
       <div className="card card-border bg-base-300 w-96">
         <div className="card-body">
           <h2 className="card-title justify-center">Login</h2>
+
           <div>
             <label className="input validator my-2">
               <svg
@@ -77,6 +79,7 @@ const Login = () => {
               Enter valid email address
             </div>
           </div>
+
           <label className="input validator">
             <svg
               className="h-[1em] opacity-50"
@@ -98,7 +101,7 @@ const Login = () => {
               type="password"
               required
               placeholder="Password"
-              minlength="8"
+              minLength="8"
               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
               title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
               value={password}
@@ -114,11 +117,22 @@ const Login = () => {
             <br />
             At least one uppercase letter
           </p>
+
           <div className="card-actions justify-center">
             <button className="btn btn-primary" onClick={handleLogin}>
               Login
             </button>
           </div>
+
+          <p className="text-sm text-center mt-4">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-blue-600 hover:underline font-semibold"
+            >
+              Create an account
+            </Link>
+          </p>
         </div>
       </div>
     </div>
