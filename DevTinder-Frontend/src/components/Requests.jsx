@@ -63,7 +63,7 @@ const Requests = () => {
           {requests.map((req) => (
             <div
               key={req._id}
-              className="mx-auto w-full max-w-4xl flex bg-white shadow-md rounded-lg overflow-hidden"
+              className="mx-auto w-full max-w-3xl flex bg-white shadow-md rounded-lg overflow-hidden"
             >
               <img
                 src={
