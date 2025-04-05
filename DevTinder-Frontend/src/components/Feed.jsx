@@ -72,7 +72,7 @@ const Feed = () => {
     <>
       {feed?.length > 0 && (
         <div className="flex items-center justify-center ">
-          <div className="card bg-base-100 w-96 shadow-md p-4">
+          <div className="card bg-base-100 w-96 shadow-md p-4 h-130">
             <figure>
               <img
                 className="w-80 h-80 object-cover rounded-md"

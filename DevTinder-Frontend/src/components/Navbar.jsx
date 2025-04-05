@@ -13,7 +13,7 @@ const Navbar = () => {
     dispatch(removeUser(null));
     return navigate("/login");
   };
-  const handleClick = () => {
+  const handleClickFeed = () => {
     if (user) {
       navigate("/");
     }
@@ -22,7 +22,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-base-100 shadow-md">
       <div className="navbar bg-base-300 shadow-sm">
         <div className="flex-1">
-          <button onClick={handleClick} className="btn btn-ghost text-xl">
+          <button onClick={handleClickFeed} className="btn btn-ghost text-xl">
             😎 DevTinder
           </button>
         </div>
@@ -52,10 +52,31 @@ const Navbar = () => {
                   <li>
                     <button
                       onClick={() => {
+                        document.activeElement.blur();
                         return navigate("/profile");
                       }}
                     >
                       Profile
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        document.activeElement.blur();
+                        return navigate("/connections");
+                      }}
+                    >
+                      Connections
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        document.activeElement.blur();
+                        return navigate("/requests");
+                      }}
+                    >
+                      Requests
                     </button>
                   </li>
                   <li>
