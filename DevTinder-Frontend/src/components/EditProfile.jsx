@@ -92,8 +92,9 @@ const EditProfile = ({ setEditing }) => {
       <div className="flex flex-wrap justify-center items-start mt-10 gap-10 px-6">
         <div className="w-full max-w-sm bg-base-100 shadow-md p-4 rounded-md">
           <h2 className="text-lg font-semibold mb-2">Edit Profile</h2>
-          <form className="space-y-2">
-            <div className="flex flex-col items-center space-y-1">
+          <form className="space-y-3">
+            {/* Profile Picture */}
+            <div className="flex flex-col items-center space-y-2">
               <img
                 src={
                   photo ||
@@ -102,72 +103,102 @@ const EditProfile = ({ setEditing }) => {
                 alt="Preview"
                 className="w-24 h-24 object-cover rounded-full"
               />
+              <div className="flex items-center w-full">
+                <label className="text-sm font-medium w-1/4 mr-2">
+                  Image URL:
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter image URL"
+                  value={photo}
+                  onChange={(e) => setPhoto(e.target.value)}
+                  className="input input-bordered input-sm w-4/5"
+                />
+              </div>
+            </div>
+
+            {/* First Name */}
+            <div className="flex items-center">
+              <label className="text-sm font-medium w-1/4 mr-2">
+                First Name:
+              </label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      setPhoto(reader.result);
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                className="file-input file-input-bordered w-full"
+                type="text"
+                value={firstName}
+                disabled
+                className="input input-bordered input-sm w-4/5 bg-gray-100"
               />
             </div>
 
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              disabled
-              className="input input-bordered input-sm w-full bg-gray-100"
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              disabled
-              className="input input-bordered input-sm w-full bg-gray-100"
-            />
-            <input
-              type="number"
-              placeholder="Age"
-              value={age}
-              disabled
-              className="input input-bordered input-sm w-full bg-gray-100"
-            />
-            <input
-              type="text"
-              placeholder="Gender"
-              value={gender}
-              disabled
-              className="input input-bordered input-sm w-full bg-gray-100"
-            />
-            <textarea
-              placeholder="About"
-              value={about}
-              onChange={(e) => setAbout(e.target.value)}
-              className="textarea textarea-bordered textarea-sm w-full"
-              rows={2}
-            ></textarea>
-            <input
-              type="text"
-              placeholder="Skills (comma separated)"
-              value={skills.join(", ")}
-              onChange={(e) =>
-                setSkills(
-                  e.target.value
-                    .split(",")
-                    .map((skill) => skill.trim())
-                    .filter((skill) => skill)
-                )
-              }
-              className="input input-bordered input-sm w-full"
-            />
+            {/* Last Name */}
+            <div className="flex items-center">
+              <label className="text-sm font-medium w-1/4 mr-2">
+                Last Name:
+              </label>
+              <input
+                type="text"
+                value={lastName}
+                disabled
+                className="input input-bordered input-sm w-4/5 bg-gray-100"
+              />
+            </div>
+
+            {/* Age */}
+            <div className="flex items-center">
+              <label className="text-sm font-medium w-1/4 mr-2">Age:</label>
+              <input
+                type="number"
+                value={age}
+                disabled
+                className="input input-bordered input-sm w-4/5 bg-gray-100"
+              />
+            </div>
+
+            {/* Gender */}
+            <div className="flex items-center">
+              <label className="text-sm font-medium w-1/4 mr-2">Gender:</label>
+              <input
+                type="text"
+                value={gender}
+                disabled
+                className="input input-bordered input-sm w-4/5 bg-gray-100"
+              />
+            </div>
+
+            {/* About */}
+            <div className="flex items-start">
+              <label className="text-sm font-medium w-1/4 mr-2 pt-1">
+                About:
+              </label>
+              <textarea
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
+                className="textarea textarea-bordered textarea-sm w-4/5"
+                rows={2}
+              ></textarea>
+            </div>
+
+            {/* Skills */}
+            <div className="flex items-start">
+              <label className="text-sm font-medium w-1/4 mr-2 pt-1">
+                Skills:
+              </label>
+              <input
+                type="text"
+                value={skills.join(", ")}
+                onChange={(e) =>
+                  setSkills(
+                    e.target.value
+                      .split(",")
+                      .map((skill) => skill.trim())
+                      .filter((skill) => skill)
+                  )
+                }
+                className="input input-bordered input-sm w-4/5"
+              />
+            </div>
+
+            {/* Buttons */}
             <div className="flex justify-between gap-2 pt-2">
               <button
                 onClick={handleSave}
