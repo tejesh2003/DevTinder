@@ -13,11 +13,9 @@ const Feed = () => {
     try {
       const res = await axios.get(BASE_URL + "/feed", {
         withCredentials: true,
-        params: {
-          page: page,
-        },
       });
       dispatch(addFeed(res.data));
+      setItem(0);
     } catch (err) {
       console.log(err);
     }
@@ -35,9 +33,9 @@ const Feed = () => {
           withCredentials: true,
         }
       );
+      const size = feed.length;
       const nextItem = item + 1;
-      if (nextItem == 5) {
-        setItem(0);
+      if (nextItem == size) {
         setPage(page + 1);
       } else {
         setItem(nextItem);
@@ -58,9 +56,9 @@ const Feed = () => {
           withCredentials: true,
         }
       );
+      const size = feed.length;
       const nextItem = item + 1;
-      if (nextItem == 5) {
-        setItem(0);
+      if (nextItem == size) {
         setPage(page + 1);
       } else {
         setItem(nextItem);
@@ -70,7 +68,6 @@ const Feed = () => {
       console.log(err);
     }
   };
-
   return (
     <>
       {feed?.length > 0 && (
@@ -78,6 +75,7 @@ const Feed = () => {
           <div className="card bg-base-100 w-96 shadow-md p-4">
             <figure>
               <img
+                className="w-80 h-80 object-cover rounded-md"
                 src={
                   feed[item]?.photoUrl ||
                   "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
@@ -134,6 +132,21 @@ const Feed = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {feed?.length === 0 && (
+        <div className="flex flex-col items-center justify-center mt-10">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+            alt="No Profiles"
+            className="w-40 h-40 mb-4"
+          />
+          <h2 className="text-lg font-semibold text-gray-700">
+            No more profiles to show!
+          </h2>
+          <p className="text-sm text-gray-500">
+            Check back later for more suggestions.
+          </p>
         </div>
       )}
     </>

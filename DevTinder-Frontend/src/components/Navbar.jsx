@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { removeUser } from "../utils/userSlice";
 
 const Navbar = () => {
@@ -13,11 +13,18 @@ const Navbar = () => {
     dispatch(removeUser(null));
     return navigate("/login");
   };
+  const handleClick = () => {
+    if (user) {
+      navigate("/");
+    }
+  };
   return (
     <nav className="sticky top-0 z-50 bg-base-100 shadow-md">
       <div className="navbar bg-base-300 shadow-sm">
         <div className="flex-1">
-          <a className="btn btn-ghost text-xl">😎 DevTinder</a>
+          <button onClick={handleClick} className="btn btn-ghost text-xl">
+            😎 DevTinder
+          </button>
         </div>
         <div className="flex gap-2">
           <div className="dropdown dropdown-end mx-5">
@@ -33,7 +40,7 @@ const Navbar = () => {
                       alt="user photo"
                       src={
                         user.photoUrl ||
-                        "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
                       }
                     />
                   </div>

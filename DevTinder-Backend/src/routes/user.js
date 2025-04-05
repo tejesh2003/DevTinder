@@ -4,7 +4,15 @@ const { userAuth } = require("../middlewares/auth");
 const ConnectionRequestModel = require("../models/connectionRequest");
 const userRouter = express.Router();
 
-const SAFE_DATA = ["firstName", "lastName", "age", "gender", "about", "skills"];
+const SAFE_DATA = [
+  "firstName",
+  "lastName",
+  "age",
+  "gender",
+  "about",
+  "skills",
+  "photoUrl",
+];
 //requests that the user need to review
 userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
   try {
