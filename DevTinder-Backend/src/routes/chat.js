@@ -20,6 +20,9 @@ chatRouter.post("/chat/:id", userAuth, async (req, res) => {
   try {
     const user = req.user;
     const { content } = req.body;
+    if (!content || content.length === 0) {
+      throw new Error("Content is required");
+    }
     const receiverId = req.params.id;
     const connection = await ConnectionRequestModel.find({
       $or: [
@@ -66,10 +69,21 @@ chatRouter.post("/chat/:id", userAuth, async (req, res) => {
 chatRouter.get("/chats", userAuth, async (req, res) => {
   try {
     const user = req.user;
-    const chatList = await chat.find({
-      $or: [{ user1: user._id }, { user2: user._id }],
+    const chatList = await chat
+      .find({
+        $or: [{ user1: user._id }, { user2: user._id }],
+      })
+      .populate("user1", SAFE_DATA)
+      .populate("user2", SAFE_DATA)
+      .populate("latestMessage", "content sender createdAt");
+    const newChatList = chatList.map((chat) => {
+      const chatUser = chat.user1._id === user._id ? chat.user1 : chat.user2;
+      return {
+        user: chatUser,
+        latestMessage: chat.latestMessage,
+      };
     });
-    res.send(chatList);
+    res.send(newChatList);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

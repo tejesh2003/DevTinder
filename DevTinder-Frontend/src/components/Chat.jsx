@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import ChatList from "./ChatList";
 
 const socket = io("http://localhost:7777", {
   withCredentials: true,
@@ -44,33 +45,41 @@ const ChatSocket = () => {
   };
 
   return (
-    <div className="flex justify-end min-h-screen items-center bg-base-200 p-4">
-      <div className="w-full md:w-1/2 bg-white shadow-xl rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-4 text-center">Socket.IO Chat</h2>
+    <div className="flex flex-grow min-h-0 bg-base-200">
+      <div className="w-1/2 overflow-y-auto p-4">
+        <ChatList />
+      </div>
 
-        <div className="h-72 overflow-y-auto border rounded p-4 mb-4 bg-base-100">
-          <ul className="space-y-2">
-            {chatMessages.map((msg, index) => (
-              <li key={index} className="chat chat-start">
-                <div className="chat-bubble">{msg}</div>
-              </li>
-            ))}
-            <div ref={bottomRef} />
-          </ul>
+      <div className="w-1/2 flex items-center justify-center p-4">
+        <div className="w-full md:w-11/12 bg-white shadow-xl rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-4 text-center">Socket.IO Chat</h2>
+
+          <div className="h-[calc(100vh-190px)] overflow-hidden flex flex-col">
+            <div className="flex-grow overflow-y-auto border rounded p-4 mb-4 bg-base-100">
+              <ul className="space-y-2">
+                {chatMessages.map((msg, index) => (
+                  <li key={index} className="chat chat-start">
+                    <div className="chat-bubble">{msg}</div>
+                  </li>
+                ))}
+                <div ref={bottomRef} />
+              </ul>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="input input-bordered w-full"
+              />
+              <button type="submit" className="btn btn-primary">
+                Send
+              </button>
+            </form>
+          </div>
         </div>
-
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="input input-bordered w-full"
-          />
-          <button type="submit" className="btn btn-primary">
-            Send
-          </button>
-        </form>
       </div>
     </div>
   );

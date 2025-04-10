@@ -1,23 +1,32 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { removeUser } from "../utils/userSlice";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleLogout = () => {
     Cookies.remove("token");
     dispatch(removeUser(null));
     return navigate("/login");
   };
+
   const handleClickFeed = () => {
     if (user) {
       navigate("/");
     }
   };
+
+  const handleClickMessages = () => {
+    if (user) {
+      navigate("/chats");
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-base-100 shadow-md">
       <div className="navbar bg-base-300 shadow-sm">
@@ -26,7 +35,29 @@ const Navbar = () => {
             😎 DevTinder
           </button>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={handleClickMessages}
+            className="btn btn-ghost btn-circle text-xl"
+            title="Messages"
+          >
+            {/* Correct Mail Icon from HeroIcons */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M2.25 6.75L12 13.5l9.75-6.75M21 6v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2z"
+              />
+            </svg>
+          </button>
+
           <div className="dropdown dropdown-end mx-5">
             {user && (
               <>
