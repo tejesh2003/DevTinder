@@ -93,7 +93,9 @@ chatRouter.get("/chats", userAuth, async (req, res) => {
 
 chatRouter.get("/messages/:id", userAuth, async (req, res) => {
   try {
+    const limit = 20;
     const user = req.user;
+    const page = parseInt(req.query.page) || 1;
     const receiverId = req.params.id;
     const reqChat = await chat.findOne({
       $or: [
@@ -101,9 +103,17 @@ chatRouter.get("/messages/:id", userAuth, async (req, res) => {
         { user1: receiverId, user2: user._id },
       ],
     });
+
+    if (!reqChat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
     const allMessages = await messages
       .find({ chatId: reqChat._id })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(limit * (page - 1))
+      .limit(limit);
+
     res.send(allMessages);
   } catch (err) {
     res.status(500).json({ message: err.message });

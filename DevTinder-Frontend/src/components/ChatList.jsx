@@ -22,7 +22,7 @@ const getTimeAgo = (timestamp) => {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 };
 
-const ChatList = () => {
+const ChatList = ({ setConnection }) => {
   const [chats, setChats] = useState([]);
 
   const getChat = async () => {
@@ -41,7 +41,7 @@ const ChatList = () => {
   }, []);
 
   return (
-    <div className="w-full h-full overflow-y-auto px-4 py-6 bg-gray-50">
+    <div className="w-full h-full overflow-y-auto px-4 py-6 bg-base-200">
       {chats.length === 0 ? (
         <div className="flex justify-center items-center h-full text-center text-4xl text-gray-400">
           <span role="img" aria-label="empty-chat" className="mr-2">
@@ -54,7 +54,8 @@ const ChatList = () => {
           {chats.map((chat) => (
             <div
               key={chat._id || `${chat.user?._id}-${Math.random()}`}
-              className="bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center p-4 gap-4"
+              className=" rounded-xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center bg-base-100 p-4 gap-4"
+              onClick={() => setConnection(chat)}
             >
               <img
                 src={chat.user?.photoUrl || "/default-avatar.png"}
