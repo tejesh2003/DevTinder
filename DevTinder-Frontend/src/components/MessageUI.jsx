@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { BASE_URL } from "../utils/constants";
+import { useSelector } from "react-redux";
 
 const socket = io("http://localhost:7777", {
   withCredentials: true,
@@ -9,10 +10,12 @@ const socket = io("http://localhost:7777", {
 });
 
 const MessageUI = ({ connection, messages, setMessages }) => {
+  const loginUser = useSelector((store) => store.user);
   const [message, setMessage] = useState("");
   const [page, setPage] = useState(1);
   const [showDate, setShowDate] = useState(null);
   const bottomRef = useRef(null);
+  const scrollRef = useRef(null);
 
   const getMessages = async (page = 1) => {
     try {
@@ -49,40 +52,57 @@ const MessageUI = ({ connection, messages, setMessages }) => {
     setMessages([]);
   }, [connection]);
 
+  const handleMessage = ({ content, receiverId }) => {
+    console.log("recieved");
+    setMessages((prevMessages) => [
+      {
+        content: content,
+        sender: connection.user._id,
+        createdAt: new Date().toISOString(),
+      },
+      ...prevMessages,
+    ]);
+  };
+
   useEffect(() => {
-    getMessages(page);
-
-    const handleMessage = (msg) => {
-      setMessages((prevMessages) => [
-        { content: msg, createdAt: new Date().toISOString() },
-        ...prevMessages,
-      ]);
-      sendMessage(msg);
-    };
-
     socket.on("connect", () => {
-      console.log("Connected to socket server");
+      console.log("connecting");
     });
+
+    console.log("registering");
+    socket.emit("register", loginUser._id);
 
     socket.on("disconnect", () => {
       console.log("Disconnected from socket server");
     });
 
-    socket.on("chat message", handleMessage);
+    socket.on("receive message", handleMessage);
 
     return () => {
-      socket.off("chat message", handleMessage);
+      socket.off("receive message", handleMessage);
     };
-  }, [connection.user._id, page, setMessages]);
+  }, []);
+
+  useEffect(() => {
+    getMessages(page);
+  }, [connection.user._id, page]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (message.trim()) {
-      socket.emit("chat message", message);
+      socket.emit("chat message", {
+        content: message,
+        receiverId: connection.user._id,
+      });
+      setMessages((prevMessages) => [
+        { content: message, createdAt: new Date().toISOString() },
+        ...prevMessages,
+      ]);
+      await sendMessage(message);
       setMessage("");
     }
   };
@@ -116,19 +136,16 @@ const MessageUI = ({ connection, messages, setMessages }) => {
         <div
           className="flex-grow overflow-y-auto border rounded p-4 mb-4 bg-base-100 flex flex-col-reverse"
           onScroll={(e) => {
-            if (
-              e.target.scrollHeight - e.target.scrollTop ===
-              e.target.clientHeight
-            ) {
+            if (e.target.scrollTop === 0) {
               loadMoreMessages();
             }
           }}
         >
           <ul className="space-y-2 flex flex-col-reverse">
             <div ref={bottomRef} />
-            {messages.map((msg) => (
+            {messages.map((msg, index) => (
               <li
-                key={msg._id}
+                key={msg._id || index}
                 className={`chat ${
                   msg.sender === connection.user._id ? "chat-start" : "chat-end"
                 }`}

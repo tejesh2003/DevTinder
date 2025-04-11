@@ -77,7 +77,11 @@ chatRouter.get("/chats", userAuth, async (req, res) => {
       .populate("user2", SAFE_DATA)
       .populate("latestMessage", "content sender createdAt");
     const newChatList = chatList.map((chat) => {
-      const chatUser = chat.user1._id === user._id ? chat.user1 : chat.user2;
+      const chatUser =
+        chat.user1._id.toString() === user._id.toString()
+          ? chat.user2
+          : chat.user1;
+
       return {
         user: chatUser,
         latestMessage: chat.latestMessage,
