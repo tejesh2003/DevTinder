@@ -28,11 +28,36 @@ const MessageUI = ({ connection, messages, setMessages }) => {
     }
   };
 
+  const sendMessage = async (msg) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + `/chat/${connection.user._id}`,
+        {
+          content: msg,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    setMessages([]);
+  }, [connection]);
+
   useEffect(() => {
     getMessages(page);
 
     const handleMessage = (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
+      setMessages((prevMessages) => [
+        { content: msg, createdAt: new Date().toISOString() },
+        ...prevMessages,
+      ]);
+      sendMessage(msg);
     };
 
     socket.on("connect", () => {
@@ -89,35 +114,40 @@ const MessageUI = ({ connection, messages, setMessages }) => {
 
       <div className="h-[calc(100vh-230px)] overflow-hidden flex flex-col">
         <div
-          className="flex-grow overflow-y-auto border rounded p-4 mb-4 bg-base-100"
+          className="flex-grow overflow-y-auto border rounded p-4 mb-4 bg-base-100 flex flex-col-reverse"
           onScroll={(e) => {
-            if (e.target.scrollTop === 0) {
+            if (
+              e.target.scrollHeight - e.target.scrollTop ===
+              e.target.clientHeight
+            ) {
               loadMoreMessages();
             }
           }}
         >
-          <ul className="space-y-2">
-            {messages
-              .slice()
-              .reverse()
-              .map((msg) => (
-                <li key={msg._id} className="chat chat-start">
-                  <div
-                    className="chat-bubble cursor-pointer"
-                    onClick={() => toggleDate(msg._id)}
-                  >
-                    {msg.content}
-                  </div>
-                  {showDate === msg._id && (
-                    <div className="chat-footer">
-                      <span className="text-sm text-gray-500">
-                        {new Date(msg.createdAt).toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-                </li>
-              ))}
+          <ul className="space-y-2 flex flex-col-reverse">
             <div ref={bottomRef} />
+            {messages.map((msg) => (
+              <li
+                key={msg._id}
+                className={`chat ${
+                  msg.sender === connection.user._id ? "chat-start" : "chat-end"
+                }`}
+              >
+                <div
+                  className="chat-bubble cursor-pointer"
+                  onClick={() => toggleDate(msg._id)}
+                >
+                  {msg.content}
+                </div>
+                {showDate === msg._id && (
+                  <div className="chat-footer">
+                    <span className="text-sm text-gray-500">
+                      {new Date(msg.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </li>
+            ))}
           </ul>
         </div>
 
