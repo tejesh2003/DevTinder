@@ -15,7 +15,7 @@ const MessageUI = ({ connection, messages, setMessages }) => {
   const [page, setPage] = useState(1);
   const [showDate, setShowDate] = useState(null);
   const bottomRef = useRef(null);
-  const scrollRef = useRef(null);
+  const [scroll, setScroll] = useState(true);
 
   const getMessages = async (page = 1) => {
     try {
@@ -25,7 +25,7 @@ const MessageUI = ({ connection, messages, setMessages }) => {
           withCredentials: true,
         }
       );
-      setMessages((prevMessages) => [...res.data, ...prevMessages]);
+      setMessages((prevMessages) => [...res.data.reverse(), ...prevMessages]);
     } catch (err) {
       console.log(err);
     }
@@ -53,15 +53,15 @@ const MessageUI = ({ connection, messages, setMessages }) => {
   }, [connection]);
 
   const handleMessage = ({ content, receiverId }) => {
-    console.log("recieved");
     setMessages((prevMessages) => [
+      ...prevMessages,
       {
         content: content,
         sender: connection.user._id,
         createdAt: new Date().toISOString(),
       },
-      ...prevMessages,
     ]);
+    setScroll(true);
   };
 
   useEffect(() => {
@@ -88,8 +88,15 @@ const MessageUI = ({ connection, messages, setMessages }) => {
   }, [connection.user._id, page]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scroll && messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      setScroll(false);
+    }
   }, [messages]);
+
+  useEffect(() => {
+    console.log("scroll", scroll);
+  }, [scroll]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,9 +106,10 @@ const MessageUI = ({ connection, messages, setMessages }) => {
         receiverId: connection.user._id,
       });
       setMessages((prevMessages) => [
-        { content: message, createdAt: new Date().toISOString() },
         ...prevMessages,
+        { content: message, createdAt: new Date().toISOString() },
       ]);
+      setScroll(true);
       await sendMessage(message);
       setMessage("");
     }
@@ -134,15 +142,15 @@ const MessageUI = ({ connection, messages, setMessages }) => {
 
       <div className="h-[calc(100vh-230px)] overflow-hidden flex flex-col">
         <div
-          className="flex-grow overflow-y-auto border rounded p-4 mb-4 bg-base-100 flex flex-col-reverse"
+          className="flex-grow overflow-y-auto border rounded p-4 mb-4 bg-base-100"
           onScroll={(e) => {
-            if (e.target.scrollTop === 0) {
+            const { scrollTop } = e.target;
+            if (scrollTop === 0) {
               loadMoreMessages();
             }
           }}
         >
-          <ul className="space-y-2 flex flex-col-reverse">
-            <div ref={bottomRef} />
+          <ul className="space-y-2 flex flex-col">
             {messages.map((msg, index) => (
               <li
                 key={msg._id || index}
@@ -165,6 +173,7 @@ const MessageUI = ({ connection, messages, setMessages }) => {
                 )}
               </li>
             ))}
+            <div ref={bottomRef} />
           </ul>
         </div>
 
