@@ -93,6 +93,44 @@ chatRouter.get("/chats", userAuth, async (req, res) => {
   }
 });
 
+//call a partiular chat
+
+chatRouter.get("/latestmessage/:id", userAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const receiverId = req.params.id;
+
+    const latestChat = await chat
+      .findOne({
+        $or: [
+          { user1: userId, user2: receiverId },
+          { user1: receiverId, user2: userId },
+        ],
+      })
+      .populate("user1", SAFE_DATA)
+      .populate("user2", SAFE_DATA)
+      .populate("latestMessage", "content sender createdAt")
+      .lean();
+
+    if (!latestChat) {
+      return res.status(404).json({ message: "No chat found" });
+    }
+
+    const otherUser =
+      latestChat.user1._id.toString() === userId.toString()
+        ? latestChat.user2
+        : latestChat.user1;
+
+    res.status(200).json({
+      user: otherUser,
+      latestMessage: latestChat.latestMessage,
+    });
+  } catch (err) {
+    console.error("Error fetching latest message:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 //All messages between 2 particular users
 
 chatRouter.get("/messages/:id", userAuth, async (req, res) => {

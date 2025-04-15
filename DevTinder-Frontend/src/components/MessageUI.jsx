@@ -9,7 +9,13 @@ const socket = io("http://localhost:7777", {
   transports: ["websocket"],
 });
 
-const MessageUI = ({ connection, messages, setMessages }) => {
+const MessageUI = ({
+  connection,
+  messages,
+  setMessages,
+  setMessageSent,
+  messageSent,
+}) => {
   const loginUser = useSelector((store) => store.user);
   const [message, setMessage] = useState("");
   const [page, setPage] = useState(1);
@@ -62,6 +68,7 @@ const MessageUI = ({ connection, messages, setMessages }) => {
       },
     ]);
     setScroll(true);
+    setMessageSent(messageSent + 1);
   };
 
   useEffect(() => {
@@ -112,6 +119,7 @@ const MessageUI = ({ connection, messages, setMessages }) => {
       setScroll(true);
       await sendMessage(message);
       setMessage("");
+      setMessageSent(messageSent + 1);
     }
   };
 

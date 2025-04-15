@@ -22,7 +22,7 @@ const getTimeAgo = (timestamp) => {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 };
 
-const ChatList = ({ setConnection }) => {
+const ChatList = ({ setConnection, connection, messageSent }) => {
   const [chats, setChats] = useState([]);
 
   const getChat = async () => {
@@ -35,6 +35,28 @@ const ChatList = ({ setConnection }) => {
       console.error("Failed to fetch chats:", err);
     }
   };
+  const getlatestMessage = async (id) => {
+    try {
+      const res = await axios.get(BASE_URL + `/latestMessage/${id}`, {
+        withCredentials: true,
+      });
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.user._id === id
+            ? { ...chat, latestMessage: res.data.latestMessage }
+            : chat
+        )
+      );
+    } catch (error) {
+      console.error("Failed to fetch latest message:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (connection) {
+      getlatestMessage(connection?.user?._id);
+    }
+  }, [messageSent]);
 
   useEffect(() => {
     getChat();
