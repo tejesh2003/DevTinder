@@ -54,6 +54,24 @@ const MessageUI = ({
     }
   };
 
+  const clearUnseen = async () => {
+    try {
+      await axios.post(
+        BASE_URL + "/clearunseen",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    clearUnseen();
+  }, []);
+
   useEffect(() => {
     setMessages([]);
   }, [connection]);

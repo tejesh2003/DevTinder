@@ -58,6 +58,11 @@ chatRouter.post("/chat/:id", userAuth, async (req, res) => {
     await Message.save();
     //update chat
     existingChat.latestMessage = Message._id;
+    if (existingChat.user1.toString() === user._id.toString()) {
+      existingChat.unseen_2 = (existingChat.unseen_2 || 0) + 1;
+    } else {
+      existingChat.unseen_1 = (existingChat.unseen_1 || 0) + 1;
+    }
     await existingChat.save();
     res.send("Message sent succesfully");
   } catch (err) {
@@ -81,13 +86,38 @@ chatRouter.get("/chats", userAuth, async (req, res) => {
         chat.user1._id.toString() === user._id.toString()
           ? chat.user2
           : chat.user1;
-
+      const unseen =
+        chat.user1._id.toString() === user._id.toString()
+          ? chat.unseen_1
+          : chat.unseen_2;
       return {
         user: chatUser,
+        unseen: unseen,
         latestMessage: chat.latestMessage,
       };
     });
     res.send(newChatList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+//clear unseen
+
+chatRouter.post("/clearunseen", userAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const clearChat = await chat.findOne({
+      $or: [{ user1: userId }, { user2: userId }],
+    });
+    if (clearChat) {
+      clearChat.user1.toString() === userId.toString()
+        ? (clearChat.unseen_1 = 0)
+        : (clearChat.unseen_2 = 0);
+    }
+    console.log("unseen", clearChat.unseen_1);
+    console.log("unseen", clearChat.unseen_2);
+    await clearChat.save();
+    res.send("Unseen messages cleared");
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

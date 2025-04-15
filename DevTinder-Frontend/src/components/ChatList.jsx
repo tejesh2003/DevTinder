@@ -22,7 +22,7 @@ const getTimeAgo = (timestamp) => {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 };
 
-const ChatList = ({ setConnection, connection, messageSent }) => {
+const ChatList = ({ setConnection, connection, messageSent, messages }) => {
   const [chats, setChats] = useState([]);
 
   const getChat = async () => {
@@ -33,6 +33,20 @@ const ChatList = ({ setConnection, connection, messageSent }) => {
       setChats(res.data);
     } catch (err) {
       console.error("Failed to fetch chats:", err);
+    }
+  };
+
+  const clearUnseen = async () => {
+    try {
+      await axios.post(
+        BASE_URL + "/clearunseen",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+      console.log(error);
     }
   };
   const getlatestMessage = async (id) => {
@@ -53,10 +67,25 @@ const ChatList = ({ setConnection, connection, messageSent }) => {
   };
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      getChat();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     if (connection) {
       getlatestMessage(connection?.user?._id);
+      console.log("hit");
+      clearUnseen();
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.user._id === connection.user._id ? { ...chat, unseen: 0 } : chat
+        )
+      );
     }
-  }, [messageSent]);
+  }, [messageSent, messages]);
 
   useEffect(() => {
     getChat();
@@ -76,14 +105,29 @@ const ChatList = ({ setConnection, connection, messageSent }) => {
           {chats.map((chat) => (
             <div
               key={chat._id || `${chat.user?._id}-${Math.random()}`}
-              className=" rounded-xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center bg-base-100 p-4 gap-4"
-              onClick={() => setConnection(chat)}
+              className="rounded-xl shadow hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center bg-base-100 p-4 gap-4"
+              onClick={() => {
+                setConnection(chat);
+                setChats((prevChats) =>
+                  prevChats.map((c) =>
+                    c._id === chat._id ? { ...c, unseen: 0 } : c
+                  )
+                );
+              }}
             >
-              <img
-                src={chat.user?.photoUrl || "/default-avatar.png"}
-                alt="User avatar"
-                className="w-14 h-14 rounded-full object-cover border border-gray-300"
-              />
+              <div className="relative">
+                <img
+                  src={chat.user?.photoUrl || "/default-avatar.png"}
+                  alt="User avatar"
+                  className="w-14 h-14 rounded-full object-cover border border-gray-300"
+                />
+                {chat.unseen > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    {chat.unseen}
+                  </span>
+                )}
+              </div>
+
               <div className="flex-1">
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-semibold text-gray-800">

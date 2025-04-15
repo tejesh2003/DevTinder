@@ -14,6 +14,7 @@ const ChatSocket = () => {
           setConnection={setConnection}
           connection={connection}
           messageSent={messageSent}
+          messages={messages}
         />
       </div>
 

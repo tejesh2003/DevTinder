@@ -45,6 +45,13 @@ ConnectDb()
       console.log(`a user connected ${socket.id}`);
 
       socket.on("register", (userId) => {
+        if (!userId) {
+          console.error(
+            "Invalid userId received during socket registration:",
+            userId
+          );
+          return;
+        }
         const existingUserIndex = users.findIndex(
           (user) => user.userId.toString() === userId.toString()
         );
