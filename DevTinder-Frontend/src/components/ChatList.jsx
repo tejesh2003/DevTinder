@@ -77,13 +77,10 @@ const ChatList = ({ setConnection, connection, messageSent, messages }) => {
   useEffect(() => {
     if (connection) {
       getlatestMessage(connection?.user?._id);
-      console.log("hit");
-      clearUnseen();
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.user._id === connection.user._id ? { ...chat, unseen: 0 } : chat
-        )
-      );
+      // clearUnseen();
+      setTimeout(() => {
+        clearUnseen();
+      }, 1000);
     }
   }, [messageSent, messages]);
 
