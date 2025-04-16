@@ -76,17 +76,26 @@ const MessageUI = ({
     setMessages([]);
   }, [connection]);
 
-  const handleMessage = ({ content, receiverId }) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        content: content,
-        sender: connection.user._id,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
-    setScroll(true);
-    setMessageSent(messageSent + 1);
+  const handleMessage = ({ content, senderId, receiverId }) => {
+    // Only update if the message is for the currently opened chat
+    if (
+      senderId === connection.user._id ||
+      receiverId === connection.user._id
+    ) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          content: content,
+          sender: senderId,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+      setScroll(true);
+      setMessageSent((prev) => prev + 1);
+    } else {
+      // Optional: dispatch to unseen, show toast, etc.
+      console.log("Message for another user, not updating this chat view.");
+    }
   };
 
   useEffect(() => {
