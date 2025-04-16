@@ -8,6 +8,7 @@ const Navbar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const unseenCount = useSelector((store) => store.unseen);
 
   const handleLogout = () => {
     Cookies.remove("token");
@@ -39,7 +40,7 @@ const Navbar = () => {
           {user && (
             <button
               onClick={handleClickMessages}
-              className="btn btn-ghost btn-circle text-xl"
+              className="btn btn-ghost btn-circle text-xl relative"
               title="Messages"
             >
               {/* Correct Mail Icon from HeroIcons */}
@@ -57,6 +58,13 @@ const Navbar = () => {
                   d="M2.25 6.75L12 13.5l9.75-6.75M21 6v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2z"
                 />
               </svg>
+
+              {/* Conditionally render unseen count */}
+              {unseenCount.unseen > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  {unseenCount.unseen}
+                </span>
+              )}
             </button>
           )}
 

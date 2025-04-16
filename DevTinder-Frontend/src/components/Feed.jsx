@@ -3,12 +3,24 @@ import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../utils/feedSlice";
+import { setUnseen } from "../utils/unseenSlice";
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const [page, setPage] = useState(1);
   const [item, setItem] = useState(0);
   const dispatch = useDispatch();
+
+  const getUnseen = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/totalunseen", {
+        withCredentials: true,
+      });
+      dispatch(setUnseen(res.data));
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const getFeed = async () => {
     try {
       const res = await axios.get(BASE_URL + "/feed", {
@@ -22,6 +34,7 @@ const Feed = () => {
   };
   useEffect(() => {
     getFeed();
+    getUnseen();
   }, [page]);
 
   const onIgnore = async () => {

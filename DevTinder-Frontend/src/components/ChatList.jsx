@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { setUnseen } from "../utils/unseenSlice";
 
 const getTimeAgo = (timestamp) => {
   if (!timestamp) return "unknown time";
@@ -24,13 +26,24 @@ const getTimeAgo = (timestamp) => {
 
 const ChatList = ({ setConnection, connection, messageSent, messages }) => {
   const [chats, setChats] = useState([]);
-
+  const dispatch = useDispatch();
+  const getUnseen = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/totalunseen", {
+        withCredentials: true,
+      });
+      dispatch(setUnseen(res.data));
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const getChat = async () => {
     try {
       const res = await axios.get(BASE_URL + "/chats", {
         withCredentials: true,
       });
       setChats(res.data);
+      getUnseen();
     } catch (err) {
       console.error("Failed to fetch chats:", err);
     }
@@ -39,7 +52,7 @@ const ChatList = ({ setConnection, connection, messageSent, messages }) => {
   const clearUnseen = async () => {
     try {
       await axios.post(
-        BASE_URL + "/clearunseen",
+        BASE_URL + `/clearunseen/${connection?.user?._id}`,
         {},
         {
           withCredentials: true,

@@ -3,6 +3,7 @@ import userReducer from "./userSlice";
 import feedReducer from "./feedSlice";
 import requestsReducer from "./requestsSlice";
 import connectionReducer from "./connectionSlice";
+import unseenReducer from "./unseenSlice";
 
 export const appStore = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const appStore = configureStore({
     feed: feedReducer,
     requests: requestsReducer,
     connection: connectionReducer,
+    unseen: unseenReducer,
   },
 });

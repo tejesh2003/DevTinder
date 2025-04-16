@@ -103,11 +103,15 @@ chatRouter.get("/chats", userAuth, async (req, res) => {
 });
 //clear unseen
 
-chatRouter.post("/clearunseen", userAuth, async (req, res) => {
+chatRouter.post("/clearunseen/:id", userAuth, async (req, res) => {
   try {
     const userId = req.user._id;
+    const receiverId = req.params.id;
     const clearChat = await chat.findOne({
-      $or: [{ user1: userId }, { user2: userId }],
+      $or: [
+        { user1: userId, user2: receiverId },
+        { user1: receiverId, user2: userId },
+      ],
     });
     if (clearChat) {
       if (clearChat.user1.toString() === userId.toString()) {
@@ -191,6 +195,26 @@ chatRouter.get("/messages/:id", userAuth, async (req, res) => {
       .limit(limit);
 
     res.send(allMessages);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+//total unseen messages
+
+chatRouter.get("/totalunseen", userAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const allChats = await chat.find({
+      $or: [{ user1: userId }, { user2: userId }],
+    });
+    let unseen = 0;
+    allChats.map((chat) => {
+      chat.user1.toString() === userId
+        ? (unseen += chat.unseen_1)
+        : (unseen += chat.unseen_2);
+    });
+    res.send({ unseen });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
