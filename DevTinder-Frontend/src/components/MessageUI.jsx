@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { BASE_URL } from "../utils/constants";
 import { useSelector } from "react-redux";
+import { combineReducers } from "@reduxjs/toolkit";
 
 const socket = io("http://localhost:7777", {
   withCredentials: true,
@@ -76,17 +77,14 @@ const MessageUI = ({
     setMessages([]);
   }, [connection]);
 
-  const handleMessage = ({ content, senderId, receiverId }) => {
+  const handleMessage = ({ content, senderId }) => {
     // Only update if the message is for the currently opened chat
-    if (
-      senderId === connection.user._id ||
-      receiverId === connection.user._id
-    ) {
+    if (senderId._id.toString() === connection.user._id.toString()) {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           content: content,
-          sender: senderId,
+          sender: senderId._id,
           createdAt: new Date().toISOString(),
         },
       ]);
@@ -137,7 +135,8 @@ const MessageUI = ({
     if (message.trim()) {
       socket.emit("chat message", {
         content: message,
-        receiverId: connection.user._id,
+        receiverId: connection?.user?._id,
+        senderId: loginUser,
       });
       setMessages((prevMessages) => [
         ...prevMessages,

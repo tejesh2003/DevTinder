@@ -116,10 +116,10 @@ chatRouter.post("/clearunseen/:id", userAuth, async (req, res) => {
     if (clearChat) {
       if (clearChat.user1.toString() === userId.toString()) {
         clearChat.unseen_1 = 0;
-        console.log("clearChat.unseen_1", clearChat.unseen_1);
+        // console.log("clearChat.unseen_1", clearChat.unseen_1);
       } else {
         clearChat.unseen_2 = 0;
-        console.log("clearChat.unseen_2", clearChat.unseen_2);
+        // console.log("clearChat.unseen_2", clearChat.unseen_2);
       }
     }
     // console.log("unseen", clearChat.unseen_1);

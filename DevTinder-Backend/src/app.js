@@ -69,14 +69,14 @@ ConnectDb()
         }
       });
 
-      socket.on("chat message", ({ content, receiverId }) => {
+      socket.on("chat message", ({ content, receiverId, senderId }) => {
         const receiver = users.find(
           (user) => user.userId.toString() === receiverId.toString()
         );
         if (receiver && receiver.socketId) {
           io.to(receiver.socketId).emit("receive message", {
             content,
-            receiverId,
+            senderId,
           });
         } else {
           console.log(`Receiver with ID ${receiverId} is offline`);
