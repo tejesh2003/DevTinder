@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/constants";
 import { useSelector } from "react-redux";
 import { combineReducers } from "@reduxjs/toolkit";
 
-const socket = io("http://localhost:7777", {
+const socket = io(BASE_URL, {
   withCredentials: true,
   transports: ["websocket"],
 });
