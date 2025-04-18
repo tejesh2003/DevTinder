@@ -58,7 +58,7 @@ const MessageUI = ({
   const clearUnseen = async () => {
     try {
       await axios.post(
-        BASE_URL + "/clearunseen",
+        BASE_URL + `/clearunseen/${connection?.user?._id}`,
         {},
         {
           withCredentials: true,
@@ -78,7 +78,6 @@ const MessageUI = ({
   }, [connection]);
 
   const handleMessage = ({ content, senderId }) => {
-    // Only update if the message is for the currently opened chat
     if (senderId._id.toString() === connection.user._id.toString()) {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -90,8 +89,8 @@ const MessageUI = ({
       ]);
       setScroll(true);
       setMessageSent((prev) => prev + 1);
+      clearUnseen();
     } else {
-      // Optional: dispatch to unseen, show toast, etc.
       console.log("Message for another user, not updating this chat view.");
     }
   };
