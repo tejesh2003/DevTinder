@@ -9,16 +9,17 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://13.60.76.85",
     credentials: true,
   },
+  path: "/api/socket.io",
 });
 
 const users = [];
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://13.60.76.85",
     credentials: true,
   })
 );
